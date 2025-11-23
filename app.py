@@ -1,37 +1,45 @@
 import streamlit as st
-from PIL import Image
 import numpy as np
+from PIL import Image
 import tensorflow as tf
 
-st.title("Solar Panel AI Dashboard — AICCS System")
+st.title("Solar Panel AI Dashboard — AICCS System (TFLite Version)")
 
-# Load model
-model = tf.keras.models.load_model("keras_model.h5")
+# Load TFLite model
+interpreter = tf.lite.Interpreter(model_path="model.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Load labels
 with open("labels.txt") as f:
     labels = [l.strip() for l in f.readlines()]
 
 st.header("1. Upload Solar Panel Image")
-pic = st.file_uploader("Upload image...", type=["jpg","png","jpeg"])
+pic = st.file_uploader("Upload image...", type=["jpg", "jpeg", "png"])
 
 dust_detected = False
 
 if pic:
     image = Image.open(pic).convert("RGB")
-    st.image(image, caption="Your image", use_column_width=True)
+    st.image(image, use_column_width=True)
 
-    img = image.resize((224,224))
-    arr = np.array(img) / 255.0
-    arr = np.expand_dims(arr, 0)
+    img = image.resize((224, 224))
+    arr = np.array(img, dtype=np.float32) / 255.0
+    arr = np.expand_dims(arr, axis=0)
 
-    preds = model.predict(arr)
+    interpreter.set_tensor(input_details[0]["index"], arr)
+    interpreter.invoke()
+
+    preds = interpreter.get_tensor(output_details[0]["index"])[0]
+    
     idx = np.argmax(preds)
     label = labels[idx]
-    conf = preds[0][idx]
+    conf = preds[idx]
 
     st.write("Prediction:", label)
-    st.write("Confidence:", round(conf*100,2), "%")
+    st.write("Confidence:", round(float(conf)*100, 2), "%")
 
     if "dust" in label.lower():
         dust_detected = True
@@ -46,8 +54,3 @@ elif temperature > 50:
     st.warning("Action: Mist Cooling")
 else:
     st.success("Action: No Action Needed")
-
-st.header("Efficiency Facts")
-st.write("- Mist cooling: +6–9% efficiency")
-st.write("- PCM cooling: +3–5% efficiency")
-st.write("- Dust cleaning: restores up to 25% power")
