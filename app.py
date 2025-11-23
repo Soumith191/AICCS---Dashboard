@@ -8,7 +8,7 @@ st.title("AICCS Solar Panel AI — TFLite Quantized Version")
 # ----------------------------
 # Load TFLite quantized model
 # ----------------------------
-interpreter = tf.lite.Interpreter(model_path="model_quantized.tflite")
+interpreter = tf.lite.Interpreter(model_path="model.tflite")
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
