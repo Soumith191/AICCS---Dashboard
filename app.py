@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 
-st.title("Solar Panel AI Dashboard — AICCS System (TFLite Version)")
+st.title("AICCS Solar Panel AI — TFLite Version")
 
 # Load TFLite model
 interpreter = tf.lite.Interpreter(model_path="model.tflite")
@@ -33,7 +33,7 @@ if pic:
     interpreter.invoke()
 
     preds = interpreter.get_tensor(output_details[0]["index"])[0]
-    
+
     idx = np.argmax(preds)
     label = labels[idx]
     conf = preds[idx]
