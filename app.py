@@ -5,7 +5,7 @@ import tensorflow as tf # To talk to your TFLite robot
 import streamlit as st  # To make the web app interactive
 
 # Load the robot’s brain
-interpreter = tf.lite.Interpreter(model_path="model_quantized.tflite")
+interpreter = tf.lite.Interpreter(model_path="model.tflite")
 interpreter.allocate_tensors()
 
 # Get info about what the robot expects
