@@ -1,2 +1,2 @@
-0 Dusty Panels
-1 Clean Panels
+0 Clean panels
+1 Dusty Panels
